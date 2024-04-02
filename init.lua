@@ -282,6 +282,7 @@ require('lazy').setup({
   },
   { 'nvim-treesitter/nvim-treesitter-context', opts = {
     mode = 'topline',
+    max_lines = 9,
   } },
   'mg979/vim-visual-multi',
   -- Here is a more advanced example where we pass configuration
@@ -930,7 +931,12 @@ end, { range = true })
 
 vim.keymap.set('n', '<leader>fd', '<cmd>Format<CR>', { desc = '[F]ormat [D]ocument' })
 vim.keymap.set('n', '<leader>tt', '<cmd>NvimTreeToggle<CR>', { desc = '[T]oggle directory tree' })
-vim.keymap.set('n', '<F4>', '<cmd>w !python3<CR>', { desc = 'Run current python file' })
+vim.keymap.set('n', '<F4>', function()
+  if vim.bo.filetype == 'python' then
+    vim.cmd 'w !python3'
+  end
+end)
+vim.keymap.set('n', '<C-ö>', '<cmd>!alacritty --working-directory . &<CR><CR>')
 
 require('conform').setup {
   format_on_save = function(bufnr)
@@ -976,7 +982,10 @@ vim.keymap.set('n', '<F12>', function()
 end)
 vim.keymap.set('n', '<Leader>b', function()
   require('dap').toggle_breakpoint()
-end, { desc = 'Toggle breakpoint' })
+end, { desc = 'Toggle [b]reakpoint' })
+vim.keymap.set('n', '<Leader>dq', function()
+  require('dap').disconnect { terminateDebuggee = true }
+end, { desc = '[Q]uit debug session' })
 vim.keymap.set('n', '<Leader>lp', function()
   require('dap').set_breakpoint(nil, nil, vim.fn.input 'Log point message: ')
 end)
@@ -992,14 +1001,13 @@ end, { desc = 'Hover widget' })
 vim.keymap.set({ 'n', 'v' }, '<Leader>dp', function()
   require('dap.ui.widgets').preview()
 end, { desc = 'Preview widget' })
-vim.keymap.set('n', '<Leader>df', function()
-  local widgets = require 'dap.ui.widgets'
-  widgets.centered_float(widgets.frames)
-end, { desc = 'Centered float widget frames' })
+
 vim.keymap.set('n', '<Leader>dc', function()
-  local widgets = require 'dap.ui.widgets'
-  widgets.centered_float(widgets.scopes)
-end, { desc = 'Centered float widget scopes' })
+  require('dap').clear_breakpoints()
+end, { desc = '[C]lear breakpoints' })
+
+vim.keymap.set('n', '<C-d>', '<C-d>zz')
+vim.keymap.set('n', '<C-u>', '<C-u>zz')
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
