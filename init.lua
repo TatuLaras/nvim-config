@@ -935,6 +935,14 @@ vim.keymap.set('n', '<F4>', function()
   if vim.bo.filetype == 'python' then
     vim.cmd 'w !python3'
   end
+  if vim.bo.filetype == 'rust' then
+    vim.cmd '!cargo run'
+  end
+end)
+vim.keymap.set('n', '<F3>', function()
+  if vim.bo.filetype == 'rust' then
+    vim.cmd '!cargo check'
+  end
 end)
 vim.keymap.set('n', '<C-ö>', '<cmd>!alacritty --working-directory . &<CR><CR>')
 
