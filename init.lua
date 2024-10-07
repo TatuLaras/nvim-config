@@ -321,22 +321,49 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  { -- Useful plugin to show you pending keybinds.
+  {
     'folke/which-key.nvim',
-    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
-    config = function() -- This is the function that runs, AFTER loading
-      require('which-key').setup()
-
-      -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-      }
-    end,
+    event = 'VeryLazy',
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    },
+    keys = {
+      { '<leader>c', group = '[C]ode' },
+      { '<leader>c_', hidden = true },
+      { '<leader>d', group = '[D]ocument' },
+      { '<leader>d_', hidden = true },
+      { '<leader>r', group = '[R]ename' },
+      { '<leader>r_', hidden = true },
+      { '<leader>s', group = '[S]earch' },
+      { '<leader>s_', hidden = true },
+      { '<leader>w', group = '[W]orkspace' },
+      { '<leader>w_', hidden = true },
+    },
   },
+  { 'RRethy/vim-hexokinase' },
+  -- { -- Useful plugin to show you pending keybinds.
+  --   'folke/which-key.nvim',
+  --   event = 'VimEnter', -- Sets the loading event to 'VimEnter'
+  --   config = function() -- This is the function that runs, AFTER loading
+  --     require('which-key').setup()
+  --
+  --     -- Document existing key chains
+  --     require('which-key').register {
+  --       { '<leader>c', group = '[C]ode' },
+  --       { '<leader>c_', hidden = true },
+  --       { '<leader>d', group = '[D]ocument' },
+  --       { '<leader>d_', hidden = true },
+  --       { '<leader>r', group = '[R]ename' },
+  --       { '<leader>r_', hidden = true },
+  --       { '<leader>s', group = '[S]earch' },
+  --       { '<leader>s_', hidden = true },
+  --       { '<leader>w', group = '[W]orkspace' },
+  --       { '<leader>w_', hidden = true },
+  --     }
+  --   end,
+  -- },
 
   -- NOTE: Plugins can specify dependencies.
   --
@@ -597,7 +624,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {},
+        -- tsserver = {},
         --
 
         lua_ls = {
@@ -657,7 +684,7 @@ require('lazy').setup({
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
         return {
-          timeout_ms = 500,
+          timeout_ms = 5000,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
       end,
@@ -680,6 +707,11 @@ require('lazy').setup({
       formatters = {
         prettier = {
           prepend_args = { '--single-quote', '--tab-width=4', '--print-width=80' },
+        },
+        biome = {
+          indentStyle = 'space',
+          indentSize = 4,
+          lineWidth = 80,
         },
       },
     },
@@ -878,7 +910,32 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
-
+  {
+    'lervag/vimtex',
+    lazy = false, -- we don't want to lazy load VimTeX
+    -- tag = "v2.15", -- uncomment to pin to a specific release
+    init = function()
+      -- VimTeX configuration goes here, e.g.
+      vim.g.vimtex_view_method = 'zathura'
+    end,
+  },
+  {
+    'linux-cultist/venv-selector.nvim',
+    dependencies = { 'neovim/nvim-lspconfig', 'nvim-telescope/telescope.nvim', 'mfussenegger/nvim-dap-python' },
+    opts = {
+      -- Your options go here
+      -- name = "venv",
+      -- auto_refresh = false
+      stay_on_this_version = true,
+    },
+    event = 'VeryLazy', -- Optional: needed only if you want to type `:VenvSelect` without a keymapping
+    keys = {
+      -- Keymap to open VenvSelector to pick a venv.
+      { '<leader>vs', '<cmd>VenvSelect<cr>' },
+      -- Keymap to retrieve the venv from a cache (the one previously used for the same project directory).
+      { '<leader>vc', '<cmd>VenvSelectCached<cr>' },
+    },
+  },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -942,11 +999,20 @@ vim.keymap.set('n', '<F4>', function()
     vim.cmd '!cargo run'
   end
 end)
+
 vim.keymap.set('n', '<F3>', function()
   if vim.bo.filetype == 'rust' then
     vim.cmd '!cargo check'
   end
 end)
+
+vim.keymap.set('n', '<leader>lw', function()
+  if vim.bo.filetype == 'tex' then
+    vim.cmd '!texcount -1 -utf8 -incbib -sum=1 -merge -q % > words'
+    vim.api.nvim_feedkeys('\n', 'n', true)
+  end
+end)
+
 vim.keymap.set('n', '<C-ö>', '<cmd>!alacritty --working-directory . &<CR><CR>')
 
 require('conform').setup {
@@ -1019,9 +1085,10 @@ end, { desc = '[C]lear breakpoints' })
 
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
+vim.keymap.set('n', '<C-Enter>', ':w<CR>')
 
 vim.keymap.set('n', '<leader>wd', function()
-  vim.cmd 'Trouble workspace_diagnostics'
+  vim.cmd 'Trouble diagnostics'
 end, { desc = '[W]orkspace [D]iagnostics' })
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
