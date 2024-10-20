@@ -342,7 +342,7 @@ require('lazy').setup({
       { '<leader>w_', hidden = true },
     },
   },
-  { 'RRethy/vim-hexokinase' },
+  -- { 'RRethy/vim-hexokinase' },
   -- { -- Useful plugin to show you pending keybinds.
   --   'folke/which-key.nvim',
   --   event = 'VimEnter', -- Sets the loading event to 'VimEnter'
@@ -1086,6 +1086,13 @@ end, { desc = '[C]lear breakpoints' })
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
 vim.keymap.set('n', '<C-Enter>', ':w<CR>')
+vim.keymap.set('n', '<F1>', '')
+
+vim.keymap.set('n', '<C-l>', '<C-PageDown>')
+vim.keymap.set('n', '<C-h>', '<C-PageUp>')
+
+vim.keymap.set('n', '<C-k>', '<C-w>5<')
+vim.keymap.set('n', '<C-j>', '<C-w>5>')
 
 vim.keymap.set('n', '<leader>wd', function()
   vim.cmd 'Trouble diagnostics'
